@@ -1,33 +1,47 @@
-/**
- * Point d'entrée de l'application.
- *
- * ┌──────────────────────────────────────────────────────────────────┐
- * │  À VOUS DE JOUER                                                 │
- * │                                                                  │
- * │  Ce composant est volontairement minimal. C'est le point de      │
- * │  départ de l'exercice décrit dans le README.                     │
- * │                                                                  │
- * │  - Mettez en place la gestion de l'état / data-fetching de votre │
- * │    choix.                                                        │
- * │  - Consommez le backend mocké (voir src/mocks/handlers.ts pour   │
- * │    le contrat d'API).                                            │
- * │  - Organisez le code comme bon vous semble.                      │
- * └──────────────────────────────────────────────────────────────────┘
- */
+import { useState } from "react";
+import { PlusIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AccessRequestList } from "@/components/AccessRequestList";
+import { AccessRequestDetailModal } from "@/components/AccessRequestDetailModal";
+import { CreateAccessRequestModal } from "@/components/CreateAccessRequestModal";
+
+type ActiveModal =
+  | { kind: "create" }
+  | { kind: "detail"; requestId: string }
+  | null;
+
 export default function App() {
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
+
+  const closeModal = () => setActiveModal(null);
+
   return (
-    <main className="app">
-      <header className="app__header">
-        <h1>Portail des habilitations</h1>
-        <p>Gestion des demandes d'accès au parc applicatif</p>
+    <main className="mx-auto max-w-5xl px-6 py-8">
+      <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Portail des habilitations</h1>
+            <p className="text-sm text-muted-foreground">
+              Gestion des demandes d'accès au parc applicatif
+            </p>
+          </div>
+        </div>
+        <Button size="lg" onClick={() => setActiveModal({ kind: "create" })}>
+          <PlusIcon data-icon="inline-start" />
+          Nouvelle demande
+        </Button>
       </header>
 
-      <section className="app__placeholder">
-        <p>
-          Squelette de départ. Consultez le <code>README.md</code> pour les
-          consignes de l'exercice, puis remplacez ce contenu.
-        </p>
+      <section aria-label="Demandes d'habilitation">
+        <AccessRequestList
+          onSelectRequest={(requestId) => setActiveModal({ kind: "detail", requestId })}
+        />
       </section>
+
+      {activeModal?.kind === "create" && <CreateAccessRequestModal onClose={closeModal} />}
+      {activeModal?.kind === "detail" && (
+        <AccessRequestDetailModal requestId={activeModal.requestId} onClose={closeModal} />
+      )}
     </main>
   );
 }
