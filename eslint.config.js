@@ -26,4 +26,12 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // shadcn/ui generated components export their cva variants alongside
+    // the component (buttonVariants, badgeVariants…): expected pattern.
+    files: ["src/components/ui/**/*.tsx"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 ]);
