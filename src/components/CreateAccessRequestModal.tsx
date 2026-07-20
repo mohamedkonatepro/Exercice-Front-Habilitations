@@ -12,9 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ErrorAlert } from "@/components/ui/error-alert";
 import { FormField } from "@/components/ui/form-field";
 import { Modal } from "@/components/ui/modal";
@@ -108,43 +111,61 @@ export function CreateAccessRequestModal({ onClose }: CreateAccessRequestModalPr
 
         <FormField id="applicationId" label="Application" error={fieldErrors.applicationId}>
           {(control) => (
-            <NativeSelect
-              className="w-full"
-              value={values.applicationId}
-              onChange={(e) => setValue("applicationId", e.target.value)}
+            <Select
+              name={control.name}
+              value={values.applicationId || undefined}
+              onValueChange={(selected) => setValue("applicationId", selected)}
               disabled={referentialsPending}
-              {...control}
             >
-              <NativeSelectOption value="">
-                {referentialsPending ? "Chargement…" : "— Sélectionner une application —"}
-              </NativeSelectOption>
-              {applicationsQuery.data?.map((application) => (
-                <NativeSelectOption key={application.id} value={application.id}>
-                  {application.name}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+              <SelectTrigger
+                id={control.id}
+                className="w-full"
+                aria-invalid={control["aria-invalid"]}
+                aria-describedby={control["aria-describedby"]}
+              >
+                <SelectValue
+                  placeholder={
+                    referentialsPending ? "Chargement…" : "Sélectionner une application"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {applicationsQuery.data?.map((application) => (
+                  <SelectItem key={application.id} value={application.id}>
+                    {application.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
         </FormField>
 
         <FormField id="roleId" label="Rôle" error={fieldErrors.roleId}>
           {(control) => (
-            <NativeSelect
-              className="w-full"
-              value={values.roleId}
-              onChange={(e) => setValue("roleId", e.target.value)}
+            <Select
+              name={control.name}
+              value={values.roleId || undefined}
+              onValueChange={(selected) => setValue("roleId", selected)}
               disabled={referentialsPending}
-              {...control}
             >
-              <NativeSelectOption value="">
-                {referentialsPending ? "Chargement…" : "— Sélectionner un rôle —"}
-              </NativeSelectOption>
-              {rolesQuery.data?.map((role) => (
-                <NativeSelectOption key={role.id} value={role.id}>
-                  {role.label}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+              <SelectTrigger
+                id={control.id}
+                className="w-full"
+                aria-invalid={control["aria-invalid"]}
+                aria-describedby={control["aria-describedby"]}
+              >
+                <SelectValue
+                  placeholder={referentialsPending ? "Chargement…" : "Sélectionner un rôle"}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {rolesQuery.data?.map((role) => (
+                  <SelectItem key={role.id} value={role.id}>
+                    {role.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
         </FormField>
 

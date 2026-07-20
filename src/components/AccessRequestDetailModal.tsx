@@ -15,6 +15,8 @@ import { StatusBadge } from "./StatusBadge";
 
 interface AccessRequestDetailModalProps {
   requestId: string;
+  /** Approver profile: shows the review section on PENDING requests. */
+  canReview: boolean;
   onClose: () => void;
 }
 
@@ -47,7 +49,11 @@ function SummaryItem({
  * A PENDING request also gets the review section; otherwise the
  * decision date and comment are shown.
  */
-export function AccessRequestDetailModal({ requestId, onClose }: AccessRequestDetailModalProps) {
+export function AccessRequestDetailModal({
+  requestId,
+  canReview,
+  onClose,
+}: AccessRequestDetailModalProps) {
   const requestQuery = useAccessRequest(requestId);
   const applicationsQuery = useApplications();
   const rolesQuery = useRoles();
@@ -109,7 +115,16 @@ export function AccessRequestDetailModal({ requestId, onClose }: AccessRequestDe
             </SummaryItem>
           </dl>
 
-          {view.status === "PENDING" ? (
+          {view.status === "PENDING" && !canReview ? (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Cette demande est en attente de validation par un approbateur.
+              </p>
+              <div className="flex justify-end">
+                <Button onClick={onClose}>Fermer</Button>
+              </div>
+            </>
+          ) : view.status === "PENDING" ? (
             <>
               <FormField id="reviewComment" label="Commentaire (optionnel)">
                 {(control) => (

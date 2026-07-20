@@ -229,15 +229,21 @@ _Merci de remplir cette section (elle fait partie de l'évaluation)._
 >   au changement de filtre, et `onSettled` sur la review pour resynchroniser
 >   le cache même en cas de 409.
 > - **UI : shadcn/ui** — les composants sont générés dans le repo (pas de
->   dépendance boîte noire), les primitives Radix apportent l'accessibilité et
->   les tokens CSS la cohérence visuelle. J'ai gardé des selects natifs
->   (composant `native-select`) plutôt que le Select Radix : plus simple,
->   meilleur sur mobile, et compatible avec l'option vide « Tous les statuts ».
+>   dépendance boîte noire), les primitives Radix apportent l'accessibilité
+>   (focus trap, clavier, aria) et les tokens CSS la cohérence visuelle.
+> - **Profil simulé** Demandeur / Approbateur (approbateur par défaut) : pas
+>   d'authentification dans l'exercice, mais le droit de traiter une demande
+>   est conditionné au profil, comme le ferait un vrai portail.
+> - **CI (GitHub Actions)** : lint, tests et build sur chaque push et pull
+>   request — le projet est vérifié sur une machine neutre, pas seulement
+>   sur mon poste.
 
 **Ce que vous auriez fait avec plus de temps :**
 
-> - Des tests d'intégration sur les flux critiques : création avec erreurs
->   400/500, review avec conflit 409.
+> - Des tests d'intégration sur les flux critiques (composants + MSW en
+>   Node) : création avec erreurs 400/500, review avec conflit 409.
+> - Des tests end-to-end avec Playwright sur le parcours complet :
+>   créer une demande, la retrouver dans la liste, l'approuver.
 > - Des toasts de confirmation, le tri et la pagination de la liste.
 > - Si le besoin de vraies pages s'était fait sentir (détail sur une route
 >   dédiée, deep-linking des filtres), j'aurais introduit TanStack Router —
@@ -245,4 +251,4 @@ _Merci de remplir cette section (elle fait partie de l'évaluation)._
 
 **Temps approximatif passé :**
 
-> Environ 3 h 
+> Un peu plus de 3h 

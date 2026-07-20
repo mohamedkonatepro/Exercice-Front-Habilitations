@@ -13,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "./StatusBadge";
 
 interface AccessRequestListProps {
+  /** Approver profile: opens PENDING requests for review instead of read-only. */
+  canReview: boolean;
   onSelectRequest: (requestId: string) => void;
 }
 
@@ -24,7 +26,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 const NO_FILTERS: AccessRequestFiltersValue = { status: "", q: "" };
 const SKELETON_ROW_COUNT = 4;
 
-export function AccessRequestList({ onSelectRequest }: AccessRequestListProps) {
+export function AccessRequestList({ canReview, onSelectRequest }: AccessRequestListProps) {
   const [filters, setFilters] = useState<AccessRequestFiltersValue>(NO_FILTERS);
   const debouncedQ = useDebouncedValue(filters.q, SEARCH_DEBOUNCE_MS);
 
@@ -93,30 +95,33 @@ export function AccessRequestList({ onSelectRequest }: AccessRequestListProps) {
               </tr>
             </thead>
             <tbody>
-              {views.map((request) => (
-                <tr key={request.id} className="transition-colors hover:bg-muted/40">
-                  <td className={`${CELL_CLASSES} font-medium`}>{request.requesterName}</td>
-                  <td className={CELL_CLASSES}>{request.applicationName}</td>
-                  <td className={`${CELL_CLASSES} text-muted-foreground`}>
-                    {request.roleLabel}
-                  </td>
-                  <td className={CELL_CLASSES}>
-                    <StatusBadge status={request.status} />
-                  </td>
-                  <td className={`${CELL_CLASSES} text-muted-foreground`}>
-                    {formatDateTime(request.createdAt)}
-                  </td>
-                  <td className={`${CELL_CLASSES} text-right`}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onSelectRequest(request.id)}
-                    >
-                      {request.status === "PENDING" ? "Traiter" : "Détails"}
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              {views.map((request) => {
+                const needsReview = canReview && request.status === "PENDING";
+                return (
+                  <tr key={request.id} className="transition-colors hover:bg-muted/40">
+                    <td className={`${CELL_CLASSES} font-medium`}>{request.requesterName}</td>
+                    <td className={CELL_CLASSES}>{request.applicationName}</td>
+                    <td className={`${CELL_CLASSES} text-muted-foreground`}>
+                      {request.roleLabel}
+                    </td>
+                    <td className={CELL_CLASSES}>
+                      <StatusBadge status={request.status} />
+                    </td>
+                    <td className={`${CELL_CLASSES} text-muted-foreground`}>
+                      {formatDateTime(request.createdAt)}
+                    </td>
+                    <td className={`${CELL_CLASSES} text-right`}>
+                      <Button
+                        variant={needsReview ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => onSelectRequest(request.id)}
+                      >
+                        {needsReview ? "À traiter" : "Détails"}
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -2,9 +2,12 @@ import { SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ACCESS_REQUEST_STATUS_LABELS,
   accessRequestStatusSchema,
@@ -21,6 +24,10 @@ interface AccessRequestFiltersBarProps {
   value: AccessRequestFiltersValue;
   onChange: (value: AccessRequestFiltersValue) => void;
 }
+
+// Radix Select forbids an item with an empty value: "all statuses" goes
+// through a sentinel that is mapped back to "" in the filters value.
+const ALL_STATUSES = "ALL";
 
 export function AccessRequestFiltersBar({ value, onChange }: AccessRequestFiltersBarProps) {
   return (
@@ -43,25 +50,25 @@ export function AccessRequestFiltersBar({ value, onChange }: AccessRequestFilter
         />
       </div>
 
-      <Label htmlFor="filter-status" className="sr-only">
-        Filtrer par statut
-      </Label>
-      <NativeSelect
-        id="filter-status"
-        className="bg-card"
-        value={value.status}
-        onChange={(e) => {
-          const parsed = accessRequestStatusSchema.safeParse(e.target.value);
+      <Select
+        value={value.status === "" ? ALL_STATUSES : value.status}
+        onValueChange={(selected) => {
+          const parsed = accessRequestStatusSchema.safeParse(selected);
           onChange({ ...value, status: parsed.success ? parsed.data : "" });
         }}
       >
-        <NativeSelectOption value="">Tous les statuts</NativeSelectOption>
-        {accessRequestStatusSchema.options.map((status) => (
-          <NativeSelectOption key={status} value={status}>
-            {ACCESS_REQUEST_STATUS_LABELS[status]}
-          </NativeSelectOption>
-        ))}
-      </NativeSelect>
+        <SelectTrigger className="bg-card" aria-label="Filtrer par statut">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ALL_STATUSES}>Tous les statuts</SelectItem>
+          {accessRequestStatusSchema.options.map((status) => (
+            <SelectItem key={status} value={status}>
+              {ACCESS_REQUEST_STATUS_LABELS[status]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
