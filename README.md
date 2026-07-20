@@ -206,16 +206,43 @@ _Merci de remplir cette section (elle fait partie de l'évaluation)._
 
 **Librairie de state / data-fetching choisie :**
 
-> 
+> **TanStack Query (React Query).** Le besoin ici, c'est presque uniquement de
+> l'état serveur : lister, créer et traiter des demandes. React Query gère pour
+> moi le cache, les états de chargement/erreur, les retries et l'invalidation
+> après mutation — tout ce que j'aurais dû recoder à la main avec des
+> `useEffect` + `useState`. Redux aurait été surdimensionné pour ce périmètre.
+> Pour l'état purement local (modale ouverte, champs du formulaire), un simple
+> `useState` suffit.
 
 **Choix d'architecture notables :**
 
->
+> - **Découpage en couches** : `schemas` (zod) → `api` (appels HTTP) → `hooks`
+>   (React Query) → `components` (UI). Chaque couche a un rôle clair.
+> - **Une seule frontière HTTP** (`lib/http.ts`) : les réponses sont validées
+>   avec zod et les erreurs deviennent des `ApiError` typées (status + erreurs
+>   de champs), ce qui rend la gestion des 400 / 409 / 500 simple dans les
+>   composants.
+> - **Validation partagée** : le même schéma zod valide le formulaire côté
+>   client et type le payload envoyé (mêmes règles que le serveur).
+> - **Cache raisonné** : référentiels en `staleTime: Infinity` (immuables
+>   pendant la session), `keepPreviousData` sur la liste pour éviter les flashs
+>   au changement de filtre, et `onSettled` sur la review pour resynchroniser
+>   le cache même en cas de 409.
+> - **UI : shadcn/ui** — les composants sont générés dans le repo (pas de
+>   dépendance boîte noire), les primitives Radix apportent l'accessibilité et
+>   les tokens CSS la cohérence visuelle. J'ai gardé des selects natifs
+>   (composant `native-select`) plutôt que le Select Radix : plus simple,
+>   meilleur sur mobile, et compatible avec l'option vide « Tous les statuts ».
 
 **Ce que vous auriez fait avec plus de temps :**
 
->
+> - Des tests d'intégration sur les flux critiques : création avec erreurs
+>   400/500, review avec conflit 409.
+> - Des toasts de confirmation, le tri et la pagination de la liste.
+> - Si le besoin de vraies pages s'était fait sentir (détail sur une route
+>   dédiée, deep-linking des filtres), j'aurais introduit TanStack Router —
+>   cohérent avec TanStack Query déjà en place et typé de bout en bout.
 
 **Temps approximatif passé :**
 
->
+> Environ 3 h 
